@@ -1,0 +1,44 @@
+ 
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Scrollbar globale discrète (style Gmail) ── */
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+/* Chrome / Safari / Edge */
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.0); /* invisible par défaut */
+  border-radius: 99px;
+  transition: background 0.3s;
+}
+
+/* Visible uniquement quand on survole la zone scrollable */
+*:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+/* Empêche le scroll sur le body lui-même */
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
