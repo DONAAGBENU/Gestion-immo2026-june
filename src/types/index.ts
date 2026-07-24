@@ -24,6 +24,7 @@ export interface Tenant {
   monthlyRent: number;
   deposit: number;
   status: 'active' | 'inactive' | 'pending';
+  propertyId?: string;
 }
 
 export interface Payment {

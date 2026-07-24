@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Building2, Eye, Mail, Lock, User, Phone, MapPin, AlertCircle, CheckCircle } from 'lucide-react';
+import { Building2, Eye, EyeOff, Mail, Lock, User, Phone, MapPin, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth, RegisterData } from '../context/AuthContext';
 
 const WEST_AFRICA = [
@@ -31,7 +31,6 @@ const val = {
 
 const pwdStrength = (p: string) => [p.length>=8, /[A-Z]/.test(p), /\d/.test(p), /[^A-Za-z0-9]/.test(p)].filter(Boolean).length;
 
-/* ── couleurs ── */
 const C = {
   bg:'#080a0f', card:'#111318', border:'rgba(255,255,255,0.09)',
   input:'rgba(255,255,255,0.05)', text:'#fff', muted:'#9ca3af',
@@ -39,8 +38,8 @@ const C = {
 };
 
 const iStyle = (err?: boolean, ok?: boolean): React.CSSProperties => ({
-  width:'100%', background:C.input, color:C.text, fontSize:'14px', outline:'none',
-  borderRadius:'10px', padding:'10px 12px', boxSizing:'border-box',
+  width:'100%', background:C.input, color:C.text, fontSize:'15px', outline:'none',
+  borderRadius:'10px', padding:'11px 14px', boxSizing:'border-box',
   border:`1px solid ${err ? C.err : ok ? C.ok : C.border}`, transition:'border-color .2s',
 });
 
@@ -58,7 +57,8 @@ function Login({ onSwitch }: { onSwitch: () => void }) {
   const [error,    setError]    = useState('');
   const [loading,  setLoading]  = useState(false);
 
-  const submit = () => {
+  const submit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setError('');
     if (!val.email(email))    { setError('Email invalide.'); return; }
     if (!password)             { setError('Mot de passe requis.'); return; }
@@ -67,16 +67,16 @@ function Login({ onSwitch }: { onSwitch: () => void }) {
       const r = login(email, password);
       if (!r.ok) setError(r.error ?? 'Erreur.');
       setLoading(false);
-    }, 500);
+    }, 400);
   };
 
   return (
-    <div style={{ width:'100%', maxWidth:'400px' }}>
-      <div style={{ textAlign:'center', marginBottom:'32px' }}>
-        <div style={{ width:'52px', height:'52px', borderRadius:'14px', background:'linear-gradient(135deg,#3b82f6,#6366f1)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px' }}>
+    <form onSubmit={submit} className="w-full max-w-md my-auto">
+      <div style={{ textAlign:'center', marginBottom:'28px' }}>
+        <div style={{ width:'52px', height:'52px', borderRadius:'14px', background:'linear-gradient(135deg,#3b82f6,#6366f1)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 14px' }}>
           <Building2 style={{ width:'26px', height:'26px', color:'#fff' }} />
         </div>
-        <h2 style={{ fontSize:'22px', fontWeight:800, color:C.text, marginBottom:'6px' }}>Connexion</h2>
+        <h2 style={{ fontSize:'24px', fontWeight:800, color:C.text, marginBottom:'6px' }}>Connexion</h2>
         <p style={{ color:C.muted, fontSize:'13px' }}>Accédez à votre espace PropertyFlow</p>
       </div>
 
@@ -85,7 +85,7 @@ function Login({ onSwitch }: { onSwitch: () => void }) {
         <div>
           <label style={lStyle}>Adresse email</label>
           <div style={{ position:'relative' }}>
-            <Mail style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', width:'15px', height:'15px', color:C.faint }} />
+            <Mail style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', width:'16px', height:'16px', color:C.faint }} />
             <input type="email" value={email} onChange={e => setEmail(e.target.value)}
               placeholder="exemple@email.com"
               style={{ ...iStyle(!val.email(email) && email.length>0, val.email(email) && email.length>0), paddingLeft:'38px' }} />
@@ -96,38 +96,39 @@ function Login({ onSwitch }: { onSwitch: () => void }) {
         <div>
           <label style={lStyle}>Mot de passe</label>
           <div style={{ position:'relative' }}>
-            <Lock style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', width:'15px', height:'15px', color:C.faint }} />
+            <Lock style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', width:'16px', height:'16px', color:C.faint }} />
             <input type={show ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}
-              placeholder="••••••••" style={{ ...iStyle(), paddingLeft:'38px', paddingRight:'38px' }} />
+              placeholder="••••••••" style={{ ...iStyle(), paddingLeft:'38px', paddingRight:'42px' }} />
             <button type="button" onClick={() => setShow(v => !v)}
-              style={{ position:'absolute', right:'12px', top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:C.faint, display:'flex' }}>
-              <Eye style={{ width:'15px', height:'15px' }} />
+              aria-label={show ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+              style={{ position:'absolute', right:'10px', top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:C.faint, padding:'6px', display:'flex' }}>
+              {show ? <EyeOff style={{ width:'16px', height:'16px' }} /> : <Eye style={{ width:'16px', height:'16px' }} />}
             </button>
           </div>
         </div>
 
         {error && (
           <div style={{ background:'rgba(248,113,113,0.1)', border:'1px solid rgba(248,113,113,0.3)', borderRadius:'10px', padding:'10px 14px', display:'flex', alignItems:'center', gap:'8px' }}>
-            <AlertCircle style={{ width:'14px', height:'14px', color:C.err, flexShrink:0 }} />
+            <AlertCircle style={{ width:'16px', height:'16px', color:C.err, flexShrink:0 }} />
             <p style={{ color:C.err, fontSize:'13px' }}>{error}</p>
           </div>
         )}
 
-        <button onClick={submit} disabled={loading}
+        <button type="submit" disabled={loading}
           style={{ width:'100%', padding:'13px', borderRadius:'12px', border:'none', cursor: loading ? 'not-allowed':'pointer',
             background: loading ? 'rgba(59,130,246,0.5)':'linear-gradient(135deg,#3b82f6,#6366f1)',
-            color:'#fff', fontWeight:700, fontSize:'14px' }}>
+            color:'#fff', fontWeight:700, fontSize:'15px', marginTop:'4px' }}>
           {loading ? '⟳ Connexion...' : 'Se connecter'}
         </button>
 
-        <p style={{ textAlign:'center', color:C.muted, fontSize:'13px' }}>
+        <p style={{ textAlign:'center', color:C.muted, fontSize:'14px', marginTop:'8px' }}>
           Pas encore de compte ?{' '}
-          <button onClick={onSwitch} style={{ background:'none', border:'none', color:C.accent, fontWeight:700, cursor:'pointer', fontSize:'13px' }}>
+          <button type="button" onClick={onSwitch} style={{ background:'none', border:'none', color:C.accent, fontWeight:700, cursor:'pointer', fontSize:'14px' }}>
             S'inscrire
           </button>
         </p>
       </div>
-    </div>
+    </form>
   );
 }
 
@@ -154,7 +155,8 @@ function Register({ onSwitch }: { onSwitch: () => void }) {
   const strColor = ['','#ef4444','#f59e0b','#10b981','#10b981'][strength];
   const strLabel = ['','Faible','Moyen','Bon','Fort'][strength];
 
-  const submit = () => {
+  const submit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setError('');
     if (!val.name(form.firstName))   { setError('Prénom invalide (min 2 car.).'); return; }
     if (!val.name(form.lastName))    { setError('Nom invalide (min 2 car.).'); return; }
@@ -168,30 +170,30 @@ function Register({ onSwitch }: { onSwitch: () => void }) {
       const r = register(form);
       if (!r.ok) setError(r.error ?? 'Erreur.');
       setLoading(false);
-    }, 600);
+    }, 500);
   };
 
   const T = (k: string) => touched[k];
   const F = (k: keyof RegisterData) => form[k] as string;
 
   return (
-    <div style={{ width:'100%', maxWidth:'460px' }}>
-      <div style={{ textAlign:'center', marginBottom:'24px' }}>
-        <div style={{ width:'52px', height:'52px', borderRadius:'14px', background:'linear-gradient(135deg,#3b82f6,#6366f1)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 14px' }}>
-          <Building2 style={{ width:'26px', height:'26px', color:'#fff' }} />
+    <form onSubmit={submit} className="w-full max-w-md my-auto py-4">
+      <div style={{ textAlign:'center', marginBottom:'20px' }}>
+        <div style={{ width:'48px', height:'48px', borderRadius:'14px', background:'linear-gradient(135deg,#3b82f6,#6366f1)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 12px' }}>
+          <Building2 style={{ width:'24px', height:'24px', color:'#fff' }} />
         </div>
-        <h2 style={{ fontSize:'22px', fontWeight:800, color:C.text, marginBottom:'6px' }}>Créer un compte</h2>
+        <h2 style={{ fontSize:'22px', fontWeight:800, color:C.text, marginBottom:'4px' }}>Créer un compte</h2>
         <p style={{ color:C.muted, fontSize:'13px' }}>Rejoignez PropertyFlow gratuitement</p>
       </div>
 
-      <div style={{ display:'flex', flexDirection:'column', gap:'13px' }}>
+      <div style={{ display:'flex', flexDirection:'column', gap:'12px' }}>
         {/* Nom + Prénom */}
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px' }}>
-          {[['firstName','Prénom','Jean'],['lastName','Nom','Dupont']].map(([k, label, ph]) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {[['firstName','Prénom *','Kofi'],['lastName','Nom *','MENSAH']].map(([k, label, ph]) => (
             <div key={k}>
-              <label style={lStyle}>{label} *</label>
+              <label style={lStyle}>{label}</label>
               <div style={{ position:'relative' }}>
-                <User style={{ position:'absolute', left:'10px', top:'50%', transform:'translateY(-50%)', width:'14px', height:'14px', color:C.faint }} />
+                <User style={{ position:'absolute', left:'10px', top:'50%', transform:'translateY(-50%)', width:'15px', height:'15px', color:C.faint }} />
                 <input type="text" value={F(k as keyof RegisterData)}
                   onChange={e => set(k as keyof RegisterData)(e.target.value)}
                   onBlur={() => touch(k)} placeholder={ph}
@@ -206,11 +208,11 @@ function Register({ onSwitch }: { onSwitch: () => void }) {
         <div>
           <label style={lStyle}>Email *</label>
           <div style={{ position:'relative' }}>
-            <Mail style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', width:'14px', height:'14px', color:C.faint }} />
+            <Mail style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', width:'15px', height:'15px', color:C.faint }} />
             <input type="email" value={form.email} onChange={e => set('email')(e.target.value)} onBlur={() => touch('email')}
-              placeholder="vous@email.com"
+              placeholder="kofi@email.com"
               style={{ ...iStyle(T('email') && !val.email(form.email), T('email') && val.email(form.email)), paddingLeft:'38px' }} />
-            {T('email') && val.email(form.email) && <CheckCircle style={{ position:'absolute', right:'10px', top:'50%', transform:'translateY(-50%)', width:'14px', height:'14px', color:C.ok }} />}
+            {T('email') && val.email(form.email) && <CheckCircle style={{ position:'absolute', right:'10px', top:'50%', transform:'translateY(-50%)', width:'15px', height:'15px', color:C.ok }} />}
           </div>
           {T('email') && !val.email(form.email) && <p style={{ color:C.err, fontSize:'10px', marginTop:'3px' }}>⚠ Format email invalide</p>}
         </div>
@@ -228,10 +230,10 @@ function Register({ onSwitch }: { onSwitch: () => void }) {
               ))}
             </select>
             <div style={{ position:'relative', flex:1 }}>
-              <Phone style={{ position:'absolute', left:'10px', top:'50%', transform:'translateY(-50%)', width:'14px', height:'14px', color:C.faint }} />
+              <Phone style={{ position:'absolute', left:'10px', top:'50%', transform:'translateY(-50%)', width:'15px', height:'15px', color:C.faint }} />
               <input type="tel" value={form.phone}
                 onChange={e => set('phone')(e.target.value)} onBlur={() => touch('phone')}
-                placeholder="93954818"
+                placeholder="90000000"
                 style={{ ...iStyle(T('phone') && !val.phone(form.phone), T('phone') && val.phone(form.phone)), paddingLeft:'32px', width:'100%' }} />
             </div>
           </div>
@@ -242,9 +244,9 @@ function Register({ onSwitch }: { onSwitch: () => void }) {
         <div>
           <label style={lStyle}>Adresse *</label>
           <div style={{ position:'relative' }}>
-            <MapPin style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', width:'14px', height:'14px', color:C.faint }} />
+            <MapPin style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', width:'15px', height:'15px', color:C.faint }} />
             <input type="text" value={form.address} onChange={e => set('address')(e.target.value)} onBlur={() => touch('address')}
-              placeholder="Quartier, Ville, Pays"
+              placeholder="Tokoin, Lomé, Togo"
               style={{ ...iStyle(T('address') && !val.address(form.address), T('address') && val.address(form.address)), paddingLeft:'38px' }} />
           </div>
           {T('address') && !val.address(form.address) && <p style={{ color:C.err, fontSize:'10px', marginTop:'3px' }}>⚠ Min 5 caractères</p>}
@@ -254,14 +256,14 @@ function Register({ onSwitch }: { onSwitch: () => void }) {
         <div>
           <label style={lStyle}>Mot de passe *</label>
           <div style={{ position:'relative' }}>
-            <Lock style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', width:'14px', height:'14px', color:C.faint }} />
+            <Lock style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', width:'15px', height:'15px', color:C.faint }} />
             <input type={show ? 'text' : 'password'} value={form.password}
               onChange={e => set('password')(e.target.value)} onBlur={() => touch('password')}
               placeholder="Min 8 car., 1 maj., 1 chiffre"
-              style={{ ...iStyle(), paddingLeft:'38px', paddingRight:'38px' }} />
+              style={{ ...iStyle(), paddingLeft:'38px', paddingRight:'42px' }} />
             <button type="button" onClick={() => setShow(v => !v)}
-              style={{ position:'absolute', right:'12px', top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:C.faint, display:'flex' }}>
-              <Eye style={{ width:'14px', height:'14px' }} />
+              style={{ position:'absolute', right:'10px', top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:C.faint, padding:'6px', display:'flex' }}>
+              {show ? <EyeOff style={{ width:'15px', height:'15px' }} /> : <Eye style={{ width:'15px', height:'15px' }} />}
             </button>
           </div>
           {form.password && (
@@ -280,7 +282,7 @@ function Register({ onSwitch }: { onSwitch: () => void }) {
         <div>
           <label style={lStyle}>Confirmer le mot de passe *</label>
           <div style={{ position:'relative' }}>
-            <Lock style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', width:'14px', height:'14px', color:C.faint }} />
+            <Lock style={{ position:'absolute', left:'12px', top:'50%', transform:'translateY(-50%)', width:'15px', height:'15px', color:C.faint }} />
             <input type={show ? 'text' : 'password'} value={confirm}
               onChange={e => setConfirm(e.target.value)}
               placeholder="••••••••"
@@ -291,26 +293,26 @@ function Register({ onSwitch }: { onSwitch: () => void }) {
 
         {error && (
           <div style={{ background:'rgba(248,113,113,0.1)', border:'1px solid rgba(248,113,113,0.3)', borderRadius:'10px', padding:'10px 14px', display:'flex', alignItems:'center', gap:'8px' }}>
-            <AlertCircle style={{ width:'14px', height:'14px', color:C.err, flexShrink:0 }} />
+            <AlertCircle style={{ width:'16px', height:'16px', color:C.err, flexShrink:0 }} />
             <p style={{ color:C.err, fontSize:'13px' }}>{error}</p>
           </div>
         )}
 
-        <button onClick={submit} disabled={loading}
+        <button type="submit" disabled={loading}
           style={{ width:'100%', padding:'13px', borderRadius:'12px', border:'none', cursor: loading ? 'not-allowed':'pointer',
             background: loading ? 'rgba(59,130,246,0.5)':'linear-gradient(135deg,#3b82f6,#6366f1)',
-            color:'#fff', fontWeight:700, fontSize:'14px', marginTop:'4px' }}>
+            color:'#fff', fontWeight:700, fontSize:'15px', marginTop:'6px' }}>
           {loading ? '⟳ Création...' : 'Créer mon compte'}
         </button>
 
-        <p style={{ textAlign:'center', color:C.muted, fontSize:'13px' }}>
+        <p style={{ textAlign:'center', color:C.muted, fontSize:'14px', marginTop:'6px' }}>
           Déjà un compte ?{' '}
-          <button onClick={onSwitch} style={{ background:'none', border:'none', color:C.accent, fontWeight:700, cursor:'pointer', fontSize:'13px' }}>
+          <button type="button" onClick={onSwitch} style={{ background:'none', border:'none', color:C.accent, fontWeight:700, cursor:'pointer', fontSize:'14px' }}>
             Se connecter
           </button>
         </p>
       </div>
-    </div>
+    </form>
   );
 }
 
@@ -318,13 +320,13 @@ function Register({ onSwitch }: { onSwitch: () => void }) {
 export default function AuthPage() {
   const [mode, setMode] = useState<'login'|'register'>('login');
   return (
-    <div style={{ minHeight:'100vh', background:'#080a0f', display:'flex', overflow:'hidden', position:'relative' }}>
+    <div className="min-h-screen w-full bg-[#080a0f] flex flex-col lg:flex-row overflow-y-auto overflow-x-hidden relative" style={{ WebkitOverflowScrolling: 'touch' }}>
       {/* Déco */}
       <div style={{ position:'absolute', top:'-100px', left:'-100px', width:'350px', height:'350px', borderRadius:'50%', background:'radial-gradient(circle,rgba(59,130,246,0.07),transparent)', pointerEvents:'none' }} />
       <div style={{ position:'absolute', bottom:'-80px', right:'-80px', width:'300px', height:'300px', borderRadius:'50%', background:'radial-gradient(circle,rgba(99,102,241,0.07),transparent)', pointerEvents:'none' }} />
 
       {/* Image gauche — desktop only */}
-      <div className="hidden lg:flex" style={{ flex:1, position:'relative', overflow:'hidden' }}>
+      <div className="hidden lg:flex flex-1 relative overflow-hidden min-h-screen">
         <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=85&auto=format&fit=crop"
           alt="property" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
         <div style={{ position:'absolute', inset:0, background:'linear-gradient(135deg,rgba(8,10,15,0.88),rgba(15,23,42,0.55))' }} />
@@ -341,7 +343,7 @@ export default function AuthPage() {
               précision.
             </span>
           </h2>
-          <p style={{ color:'rgba(255,255,255,0.5)', fontSize:'14px', maxWidth:'340px', lineHeight:1.6 }}>
+          <p style={{ color:'rgba(255,255,255,0.6)', fontSize:'14px', maxWidth:'340px', lineHeight:1.6 }}>
             Plateforme dédiée aux propriétaires et locataires d'Afrique de l'Ouest.
           </p>
           <div style={{ display:'flex', gap:'28px', marginTop:'28px' }}>
@@ -353,7 +355,7 @@ export default function AuthPage() {
       </div>
 
       {/* Formulaire droite */}
-      <div style={{ width:'100%', maxWidth:'520px', display:'flex', alignItems:'center', justifyContent:'center', padding:'32px 24px', overflowY:'auto' }}>
+      <div className="w-full lg:max-w-[520px] flex-1 flex items-center justify-center p-6 sm:p-10 min-h-screen overflow-y-auto z-10">
         {mode === 'login'
           ? <Login    onSwitch={() => setMode('register')} />
           : <Register onSwitch={() => setMode('login')} />

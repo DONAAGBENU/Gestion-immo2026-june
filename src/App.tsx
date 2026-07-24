@@ -24,7 +24,7 @@ import MapPage     from './components/MapPage';
 /*
   Règle d'accès :
   admin  → toutes les pages
-  client → dashboard, properties, messages, settings
+  client → dashboard, properties, messages, notifications, settings
 */
 const ALL_COMPONENTS: Record<string, React.ComponentType> = {
   dashboard:     Dashboard,
@@ -74,7 +74,7 @@ function PWABanner() {
 
 function Inner() {
   const { user, logout } = useAuth();
-  const { theme, t }     = useApp();
+  const { theme, t, _setCurrentPage, _setNavPayload } = useApp();
   const [welcomed, setWelcomed]   = useState(false);
   const [page, setPage]           = useState('dashboard');
   const [sidebarOpen, setSidebar] = useState(false);
@@ -86,6 +86,16 @@ function Inner() {
   const safePage = allowed.includes(page) ? page : 'dashboard';
   const Page     = ALL_COMPONENTS[safePage] ?? Dashboard;
 
+  // Bridge: expose navigate globally so child components can switch pages + pass payload
+  const navigate = (p: string, payload?: Record<string, string>) => {
+    if (allowed.includes(p)) {
+      setPage(p);
+      _setCurrentPage(p);
+      _setNavPayload(payload ?? null);
+    }
+  };
+  (window as any).__appNavigate = navigate;
+
   const titles: Record<string, string> = {
     dashboard:     t('dashboard'),
     properties:    t('properties'),
@@ -93,11 +103,11 @@ function Inner() {
     payments:      t('payments'),
     maintenance:   t('maintenance'),
     analytics:     t('analytics'),
-    notifications: t('settings') === 'Settings' ? 'Notifications' : 'Notifications',
-    contracts:     t('settings') === 'Settings' ? 'Contracts' : 'Contrats',
-    calendar:      t('settings') === 'Settings' ? 'Calendar' : 'Calendrier',
-    messages:      t('settings') === 'Settings' ? 'Messages' : 'Messages',
-    map:           t('settings') === 'Settings' ? 'Map' : 'Carte',
+    notifications: t('notifications'),
+    contracts:     t('contracts'),
+    calendar:      t('calendar'),
+    messages:      t('messages'),
+    map:           t('map'),
     settings:      t('settings'),
   };
 
@@ -108,7 +118,7 @@ function Inner() {
     <div className="h-screen overflow-hidden flex" style={{ background: bg }}>
       <Sidebar
         currentPage={safePage}
-        onPageChange={p => allowed.includes(p) && setPage(p)}
+        onPageChange={p => navigate(p)}
         isOpen={sidebarOpen}
         onToggle={() => setSidebar(v => !v)}
         allowedPages={allowed}

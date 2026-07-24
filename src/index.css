@@ -42,3 +42,60 @@ html, body, #root {
   height: 100%;
   overflow: hidden;
 }
+
+/* ── Responsive — mobile-safe ── */
+
+/* Évite les débordements horizontaux sur mobile */
+* {
+  box-sizing: border-box;
+}
+
+/* Viewport mobile iOS safe-area */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Touch actions améliorées */
+button, a, [role="button"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Inputs et selects natifs sur mobile */
+input, select, textarea {
+  font-size: 16px; /* Évite le zoom auto iOS */
+}
+
+@media (min-width: 768px) {
+  input, select, textarea {
+    font-size: 14px;
+  }
+}
+
+/* Fix hauteur dynamique mobile (iOS Safari) */
+@supports (height: 100dvh) {
+  html, body, #root {
+    height: 100dvh;
+  }
+}
+
+/* Utilitaire line-clamp */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Focus visible accessible */
+:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
